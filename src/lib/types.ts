@@ -29,6 +29,18 @@ export interface Quest {
 
 export type CategoryValues = Record<CategoryId, number>
 
+/** Summary of the cycle that just ended, shown in the daybreak report. */
+export interface DailyRecap {
+  /** ISO date (YYYY-MM-DD) of the day being summarized. */
+  date: string
+  questsCompleted: number
+  expGained: number
+  /** Distinct categories the Wanderer touched that day, in first-seen order. */
+  categories: CategoryId[]
+  /** Titles of the quests fulfilled (for flavor in the report). */
+  completedTitles: string[]
+}
+
 export interface WandererState {
   /** First-run flag for the welcome/onboarding beat. */
   initialized: boolean
@@ -43,4 +55,6 @@ export interface WandererState {
   lastVisitDate: string
   /** Date for which side quests were last generated. */
   sideQuestsDate: string
+  /** Recap of the previous cycle, awaiting the daybreak report. Null when none pending. */
+  pendingRecap: DailyRecap | null
 }

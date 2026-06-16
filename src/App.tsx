@@ -3,10 +3,10 @@ import Starfield from './components/Starfield'
 import { Hud, Band } from './components/Dashboard'
 import QuestCard from './components/QuestCard'
 import AddMainQuest from './components/AddMainQuest'
-import { Onboarding, AssignmentCeremony } from './components/Modals'
+import { Onboarding, DaybreakModal } from './components/Modals'
 import { Pip } from './components/PixelArt'
 import { StoreProvider, useStore } from './state/store'
-import { levelFromExp } from './lib/stats'
+import { happinessIndex, levelFromExp, pipMood } from './lib/stats'
 import type { Quest } from './lib/types'
 
 function sortQuests(quests: Quest[]): Quest[] {
@@ -23,14 +23,17 @@ function Game() {
   // Detect a level-up to fire the celebratory toast.
   useEffect(() => {
     const lvl = levelFromExp(state.totalExp).level
-    if (lvl > prevLevel.current) {
-      setLevelUp(lvl)
-      const t = setTimeout(() => setLevelUp(null), 4200)
-      prevLevel.current = lvl
-      return () => clearTimeout(t)
-    }
+    if (lvl > prevLevel.current) setLevelUp(lvl)
     prevLevel.current = lvl
   }, [state.totalExp])
+
+  // Auto-dismiss the level-up toast 5s after it appears (resets if you
+  // level up again while it is still showing).
+  useEffect(() => {
+    if (levelUp === null) return
+    const t = setTimeout(() => setLevelUp(null), 5000)
+    return () => clearTimeout(t)
+  }, [levelUp])
 
   const sideQuests = useMemo(
     () => sortQuests(state.quests.filter((q) => q.kind === 'side')),
@@ -148,12 +151,19 @@ function Game() {
         </footer>
       </div>
 
-      {pendingAssignment.length > 0 && (
-        <AssignmentCeremony
-          quests={pendingAssignment}
-          onAccept={() =>
-            dispatch({ type: 'ASSIGN_PENDING', ids: pendingAssignment.map((q) => q.id) })
-          }
+      {(state.pendingRecap !== null || pendingAssignment.length > 0) && (
+        <DaybreakModal
+          recap={state.pendingRecap}
+          name={state.name}
+          mood={pipMood(happinessIndex(state.values))}
+          sideQuests={sideQuests.filter((q) => q.status === 'active')}
+          assignments={pendingAssignment}
+          onComplete={() => {
+            if (pendingAssignment.length > 0) {
+              dispatch({ type: 'ASSIGN_PENDING', ids: pendingAssignment.map((q) => q.id) })
+            }
+            dispatch({ type: 'DISMISS_RECAP' })
+          }}
         />
       )}
 

@@ -9,6 +9,7 @@ import {
 import type { CategoryId, ExpValue } from '../data/categories'
 import { daysBetween, toISODate } from '../lib/date'
 import { generateSideQuests, makeId } from '../lib/quests'
+import { buildRecap } from '../lib/recap'
 import { applyDecay, boostValue, emptyValues } from '../lib/stats'
 import { clearState, loadState, saveState } from '../lib/storage'
 import type { Quest, WandererState } from '../lib/types'
@@ -26,6 +27,7 @@ type Action =
   | { type: 'DELETE'; id: string }
   | { type: 'ASSIGN_PENDING'; ids: string[] }
   | { type: 'PROCESS_DAY'; currentDate: string }
+  | { type: 'DISMISS_RECAP' }
   | { type: 'ADVANCE_DAY' }
   | { type: 'RESET' }
 
@@ -38,6 +40,7 @@ function freshState(): FullState {
     quests: [],
     lastVisitDate: '',
     sideQuestsDate: '',
+    pendingRecap: null,
     dayOffset: 0,
   }
 }
@@ -112,6 +115,13 @@ function reducer(state: FullState, action: Action): FullState {
       if (currentDate === state.lastVisitDate && currentDate === state.sideQuestsDate) {
         return state
       }
+      const rolledToNewDay = state.lastVisitDate !== '' && state.lastVisitDate !== currentDate
+
+      // Capture the cycle that just closed BEFORE side quests are replaced.
+      const pendingRecap = rolledToNewDay
+        ? buildRecap(state.quests, state.lastVisitDate)
+        : state.pendingRecap
+
       let values = state.values
       if (state.lastVisitDate) {
         const gap = daysBetween(state.lastVisitDate, currentDate)
@@ -129,8 +139,12 @@ function reducer(state: FullState, action: Action): FullState {
         quests: [...sideQuests, ...mainQuests],
         lastVisitDate: currentDate,
         sideQuestsDate: currentDate,
+        pendingRecap,
       }
     }
+
+    case 'DISMISS_RECAP':
+      return { ...state, pendingRecap: null }
 
     case 'ADVANCE_DAY':
       return { ...state, dayOffset: state.dayOffset + 1 }

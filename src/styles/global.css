@@ -757,10 +757,62 @@ textarea.field { resize: vertical; min-height: 38px; }
   100% { opacity: 1; transform: scale(1); filter: brightness(1); }
 }
 .assign-item__t { flex: 1; font-size: 13px; color: var(--ink); }
+.daybreak-tag {
+  flex: 0 0 auto;
+  font-family: var(--pixel);
+  font-size: 6.5px;
+  letter-spacing: 0.12em;
+  padding: 4px 5px;
+  border: 1px solid currentColor;
+}
 .modal__actions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+}
+
+/* ── Daybreak cycle report ────────────────────────────────── */
+.recap-stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.recap-stat {
+  flex: 1;
+  padding: 14px 10px;
+  text-align: center;
+  border: 1px solid var(--line);
+  background: rgba(13, 16, 33, 0.55);
+}
+.recap-stat__num {
+  font-family: var(--pixel);
+  font-size: 18px;
+  color: var(--system);
+  line-height: 1;
+}
+.recap-stat__num--gold { color: var(--gold); }
+.recap-stat__label {
+  font-family: var(--pixel);
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 10px;
+}
+.recap-realms {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  min-height: 18px;
+}
+.recap-encourage {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+  border-left: 2px solid var(--gold);
+  padding-left: 12px;
+  margin: 0 0 22px;
 }
 
 /* Onboarding modal field */
