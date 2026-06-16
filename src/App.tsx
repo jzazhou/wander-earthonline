@@ -159,7 +159,14 @@ function Game() {
             </div>
             <AddMainQuest
               onAdd={(q) =>
-                dispatch({ type: 'ADD_MAIN', title: q.title, detail: q.detail, category: q.category, exp: q.exp })
+                dispatch({
+                  type: 'ADD_MAIN',
+                  title: q.title,
+                  detail: q.detail,
+                  category: q.category,
+                  exp: q.exp,
+                  startNow: q.startNow,
+                })
               }
             />
           </div>

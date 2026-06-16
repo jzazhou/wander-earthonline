@@ -4,7 +4,7 @@ import { mulberry32, seedFromDate, shuffle } from './rng'
 import type { Quest } from './types'
 
 /** How many side quests EarthOnline issues each cycle. */
-const DAILY_SIDE_QUEST_COUNT = 4
+const DAILY_SIDE_QUEST_COUNT = 3
 /** Minimum distinct categories the daily set must cover (spec: >= 3 of 5). */
 const MIN_CATEGORIES = 3
 

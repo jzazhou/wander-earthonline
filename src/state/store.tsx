@@ -6,11 +6,12 @@ import {
   useReducer,
   type ReactNode,
 } from 'react'
+import { CATEGORY_ORDER } from '../data/categories'
 import type { CategoryId, ExpValue } from '../data/categories'
-import { daysBetween, toISODate } from '../lib/date'
+import { toISODate } from '../lib/date'
 import { generateSideQuests, makeId } from '../lib/quests'
 import { buildRecap } from '../lib/recap'
-import { applyDrift, boostValue, emptyValues } from '../lib/stats'
+import { applyNeglectDecay, boostValue, emptyDates, emptyValues } from '../lib/stats'
 import { clearState, loadState, saveState } from '../lib/storage'
 import type { Quest, WandererState } from '../lib/types'
 
@@ -21,7 +22,15 @@ interface FullState extends WandererState {
 
 type Action =
   | { type: 'INIT'; name: string }
-  | { type: 'ADD_MAIN'; title: string; detail?: string; category: CategoryId; exp: ExpValue }
+  | {
+      type: 'ADD_MAIN'
+      title: string
+      detail?: string
+      category: CategoryId
+      exp: ExpValue
+      /** Start it today (active now) vs. inscribe it for the next cycle's ceremony. */
+      startNow: boolean
+    }
   | { type: 'COMPLETE'; id: string }
   | { type: 'UNCOMPLETE'; id: string }
   | { type: 'DELETE'; id: string }
@@ -37,6 +46,7 @@ function freshState(): FullState {
     name: 'Wanderer',
     totalExp: 0,
     values: emptyValues(),
+    lastActive: emptyDates(),
     quests: [],
     lastVisitDate: '',
     sideQuestsDate: '',
@@ -59,8 +69,9 @@ function reducer(state: FullState, action: Action): FullState {
         detail: action.detail?.trim() || undefined,
         category: action.category,
         exp: action.exp,
-        status: 'drafted',
+        status: action.startNow ? 'active' : 'drafted',
         createdDate: currentDate,
+        assignedDate: action.startNow ? currentDate : undefined,
       }
       return { ...state, quests: [...state.quests, quest] }
     }
@@ -73,6 +84,8 @@ function reducer(state: FullState, action: Action): FullState {
         ...state,
         totalExp: state.totalExp + q.exp,
         values: boostValue(state.values, q.category, q.exp),
+        // Fulfilling a category resets its neglect clock.
+        lastActive: { ...state.lastActive, [q.category]: currentDate },
         quests: state.quests.map((x) =>
           x.id === action.id
             ? { ...x, status: 'completed', completedDate: currentDate }
@@ -122,10 +135,18 @@ function reducer(state: FullState, action: Action): FullState {
         ? buildRecap(state.quests, state.lastVisitDate)
         : state.pendingRecap
 
+      // Anchor any not-yet-seen category so its grace window starts now,
+      // not in 1970 (also migrates older saves without lastActive).
+      const anchor = state.lastVisitDate || currentDate
+      const lastActive = { ...state.lastActive }
+      for (const id of CATEGORY_ORDER) {
+        if (!lastActive[id]) lastActive[id] = anchor
+      }
+
+      // Categories untouched past the grace window fade; the rest hold.
       let values = state.values
       if (state.lastVisitDate) {
-        const gap = daysBetween(state.lastVisitDate, currentDate)
-        values = applyDrift(values, gap)
+        values = applyNeglectDecay(values, lastActive, state.lastVisitDate, currentDate)
       }
       // Replace side quests with today's communal set; keep all main quests.
       const mainQuests = state.quests.filter((q) => q.kind === 'main')
@@ -136,6 +157,7 @@ function reducer(state: FullState, action: Action): FullState {
       return {
         ...state,
         values,
+        lastActive,
         quests: [...sideQuests, ...mainQuests],
         lastVisitDate: currentDate,
         sideQuestsDate: currentDate,

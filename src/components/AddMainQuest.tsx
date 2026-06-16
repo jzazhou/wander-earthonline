@@ -11,22 +11,30 @@ import { CategoryIcon, Glyph } from './PixelArt'
 export default function AddMainQuest({
   onAdd,
 }: {
-  onAdd: (q: { title: string; detail?: string; category: CategoryId; exp: ExpValue }) => void
+  onAdd: (q: {
+    title: string
+    detail?: string
+    category: CategoryId
+    exp: ExpValue
+    startNow: boolean
+  }) => void
 }) {
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
   const [detail, setDetail] = useState('')
   const [category, setCategory] = useState<CategoryId>('growth')
   const [exp, setExp] = useState<ExpValue>(40)
+  const [startNow, setStartNow] = useState(true)
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
     const t = title.trim()
     if (!t) return
-    onAdd({ title: t, detail: detail.trim() || undefined, category, exp })
+    onAdd({ title: t, detail: detail.trim() || undefined, category, exp, startNow })
     setTitle('')
     setDetail('')
     setExp(40)
+    setStartNow(true)
     setOpen(false)
   }
 
@@ -42,7 +50,7 @@ export default function AddMainQuest({
 
   return (
     <form className="panel add" onSubmit={submit}>
-      <div className="add__label">Inscribe your quest — assigned next cycle</div>
+      <div className="add__label">Log a quest of your own</div>
       <div className="add__row">
         <input
           className="field"
@@ -101,12 +109,34 @@ export default function AddMainQuest({
         ))}
       </div>
 
+      <div className="add__label" style={{ marginTop: 14 }}>
+        When
+      </div>
+      <div className="chips">
+        <button
+          type="button"
+          className={`chip${startNow ? ' chip--on' : ''}`}
+          style={{ ['--c' as string]: 'var(--system)' }}
+          onClick={() => setStartNow(true)}
+        >
+          Start this cycle
+        </button>
+        <button
+          type="button"
+          className={`chip${!startNow ? ' chip--on' : ''}`}
+          style={{ ['--c' as string]: 'var(--violet)' }}
+          onClick={() => setStartNow(false)}
+        >
+          Inscribe for next cycle
+        </button>
+      </div>
+
       <div className="add__foot">
         <button type="button" className="pixel-btn pixel-btn--ghost" onClick={() => setOpen(false)}>
           Cancel
         </button>
         <button type="submit" className="pixel-btn pixel-btn--primary" disabled={!title.trim()}>
-          Inscribe Quest
+          {startNow ? 'Add Quest' : 'Inscribe Quest'}
         </button>
       </div>
     </form>

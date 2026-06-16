@@ -1,6 +1,7 @@
 import { CATEGORY_ORDER } from '../data/categories'
 import type { CategoryId, ExpValue } from '../data/categories'
-import type { CategoryValues } from './types'
+import { daysBetween } from './date'
+import type { CategoryDates, CategoryValues } from './types'
 
 // ── Levels ────────────────────────────────────────────────────────────────
 // A gentle curve: each level costs a bit more than the last.
@@ -43,14 +44,14 @@ export const VALUE_MAX = 10
 export const VALUE_START = 5
 
 /**
- * Neutral resting point. Each cycle, untouched categories drift *toward* this
- * baseline rather than sinking toward zero — so neglect relaxes you back to
- * "okay", and only sustained activity lifts you above it. (Mean reversion /
- * homeostasis, see notes in lib/stats.ts header docs.)
+ * Cycles a category may sit untouched before it begins to fade. Within this
+ * grace window the value never drops — fulfillment you earn is yours to keep.
  */
-export const BASELINE = 5
-/** Fraction of the distance to BASELINE closed per cycle (0–1). */
-const DRIFT_RATE = 0.34
+export const GRACE_CYCLES = 3
+/** How much a category loses per cycle once it is past the grace window. */
+const DECAY_PER_CYCLE = 0.6
+/** Neglect can pull a category no lower than this. */
+const VALUE_FLOOR = 0
 
 const EXP_TO_VALUE: Record<ExpValue, number> = { 20: 0.5, 40: 0.85, 60: 1.25 }
 
@@ -65,17 +66,35 @@ export function emptyValues(start = VALUE_START): CategoryValues {
   }, {} as CategoryValues)
 }
 
+export function emptyDates(fill = ''): CategoryDates {
+  return CATEGORY_ORDER.reduce((acc, id) => {
+    acc[id] = fill
+    return acc
+  }, {} as CategoryDates)
+}
+
 /**
- * Drift each category toward BASELINE over N cycles. Values above the baseline
- * relax down, values below rise up — inactivity returns you to neutral, never
- * to misery. Closed-form so a multi-day gap behaves like N single-day steps.
+ * Decay only categories that have gone untouched past the grace window, and
+ * only for the cycles beyond it. A category fulfilled within the last
+ * GRACE_CYCLES never drops; sustained gains are kept. Closed-form across a
+ * multi-day gap: counts how many of the elapsed cycles fall past the grace
+ * threshold for each category.
  */
-export function applyDrift(values: CategoryValues, days: number): CategoryValues {
-  if (days <= 0) return values
-  const factor = 1 - Math.pow(1 - DRIFT_RATE, days)
+export function applyNeglectDecay(
+  values: CategoryValues,
+  lastActive: CategoryDates,
+  fromDate: string,
+  toDate: string,
+): CategoryValues {
   const next = { ...values }
   for (const id of CATEGORY_ORDER) {
-    next[id] = clampValue(next[id] + factor * (BASELINE - next[id]))
+    const anchor = lastActive[id] || fromDate
+    const idleBefore = Math.max(0, daysBetween(anchor, fromDate))
+    const idleAfter = Math.max(0, daysBetween(anchor, toDate))
+    const decaySteps = Math.max(0, idleAfter - Math.max(idleBefore, GRACE_CYCLES))
+    if (decaySteps > 0) {
+      next[id] = Math.max(VALUE_FLOOR, next[id] - DECAY_PER_CYCLE * decaySteps)
+    }
   }
   return next
 }

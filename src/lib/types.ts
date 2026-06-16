@@ -28,6 +28,7 @@ export interface Quest {
 }
 
 export type CategoryValues = Record<CategoryId, number>
+export type CategoryDates = Record<CategoryId, string>
 
 /** Summary of the cycle that just ended, shown in the daybreak report. */
 export interface DailyRecap {
@@ -49,6 +50,8 @@ export interface WandererState {
   totalExp: number
   /** Per-category fulfillment, each 0–10. */
   values: CategoryValues
+  /** ISO date a category was last fulfilled — drives the neglect grace period. */
+  lastActive: CategoryDates
   /** Side quests are regenerated per day; keyed nothing — all live in `quests`. */
   quests: Quest[]
   /** Last date (YYYY-MM-DD) the app processed a "new day". */
