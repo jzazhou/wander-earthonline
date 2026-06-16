@@ -42,10 +42,15 @@ export const VALUE_MIN = 0
 export const VALUE_MAX = 10
 export const VALUE_START = 5
 
-/** Gentle nightly drift toward neglect — keeps the index a living thing. */
-const DAILY_DECAY = 0.5
-/** Floor that decay will not pull a category beneath. */
-const DECAY_FLOOR = 2
+/**
+ * Neutral resting point. Each cycle, untouched categories drift *toward* this
+ * baseline rather than sinking toward zero — so neglect relaxes you back to
+ * "okay", and only sustained activity lifts you above it. (Mean reversion /
+ * homeostasis, see notes in lib/stats.ts header docs.)
+ */
+export const BASELINE = 5
+/** Fraction of the distance to BASELINE closed per cycle (0–1). */
+const DRIFT_RATE = 0.34
 
 const EXP_TO_VALUE: Record<ExpValue, number> = { 20: 0.5, 40: 0.85, 60: 1.25 }
 
@@ -60,13 +65,17 @@ export function emptyValues(start = VALUE_START): CategoryValues {
   }, {} as CategoryValues)
 }
 
-/** Apply N days of decay (called when the Wanderer returns after a gap). */
-export function applyDecay(values: CategoryValues, days: number): CategoryValues {
+/**
+ * Drift each category toward BASELINE over N cycles. Values above the baseline
+ * relax down, values below rise up — inactivity returns you to neutral, never
+ * to misery. Closed-form so a multi-day gap behaves like N single-day steps.
+ */
+export function applyDrift(values: CategoryValues, days: number): CategoryValues {
   if (days <= 0) return values
+  const factor = 1 - Math.pow(1 - DRIFT_RATE, days)
   const next = { ...values }
   for (const id of CATEGORY_ORDER) {
-    const drop = DAILY_DECAY * days
-    next[id] = next[id] > DECAY_FLOOR ? Math.max(DECAY_FLOOR, next[id] - drop) : next[id]
+    next[id] = clampValue(next[id] + factor * (BASELINE - next[id]))
   }
   return next
 }

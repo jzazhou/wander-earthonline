@@ -133,17 +133,25 @@ const CROSS = [
   '.#.#.',
   '#...#',
 ]
+const HOURGLASS = [
+  '#####',
+  '.###.',
+  '..#..',
+  '.###.',
+  '#####',
+]
 
 export function Glyph({
   kind,
   unit = 3,
   color = 'currentColor',
 }: {
-  kind: 'check' | 'plus' | 'cross'
+  kind: 'check' | 'plus' | 'cross' | 'hourglass'
   unit?: number
   color?: string
 }) {
-  const rows = kind === 'check' ? CHECK : kind === 'plus' ? PLUS : CROSS
+  const rows =
+    kind === 'check' ? CHECK : kind === 'plus' ? PLUS : kind === 'hourglass' ? HOURGLASS : CROSS
   return <PixelGrid rows={rows} unit={unit} color={color} />
 }
 

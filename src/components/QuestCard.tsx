@@ -17,17 +17,27 @@ export default function QuestCard({
 
   return (
     <div
-      className={`qcard${done ? ' qcard--done' : ''}`}
+      className={`qcard${done ? ' qcard--done' : ''}${pending ? ' qcard--drafted' : ''}`}
       style={{ ['--cat' as string]: cat.color }}
     >
-      <button
-        className={`qcheck${done ? ' qcheck--on' : ''}`}
-        onClick={() => onToggle(quest.id)}
-        aria-pressed={done}
-        aria-label={done ? `Mark "${quest.title}" not done` : `Complete "${quest.title}"`}
-      >
-        {done && <Glyph kind="check" unit={2} color="#06121a" />}
-      </button>
+      {pending ? (
+        <span
+          className="qcheck qcheck--pending"
+          title="Assigned at the start of next cycle"
+          aria-hidden="true"
+        >
+          <Glyph kind="hourglass" unit={2} />
+        </span>
+      ) : (
+        <button
+          className={`qcheck${done ? ' qcheck--on' : ''}`}
+          onClick={() => onToggle(quest.id)}
+          aria-pressed={done}
+          aria-label={done ? `Mark "${quest.title}" not done` : `Complete "${quest.title}"`}
+        >
+          {done && <Glyph kind="check" unit={2} color="#06121a" />}
+        </button>
+      )}
 
       <div className="qcard__body">
         <div className="qcard__title">{quest.title}</div>
@@ -38,7 +48,7 @@ export default function QuestCard({
             {cat.name}
           </span>
           <span className="qcard__exp">+{quest.exp} EXP</span>
-          {pending && <span className="qcard__pending">AWAITING ASSIGNMENT</span>}
+          {pending && <span className="qcard__pending">ASSIGNED NEXT CYCLE</span>}
         </div>
       </div>
 

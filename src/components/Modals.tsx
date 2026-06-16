@@ -179,7 +179,7 @@ export function DaybreakModal({
         </div>
         <div className="modal__actions">
           <button className="pixel-btn pixel-btn--primary" onClick={onComplete}>
-            Begin Cycle {total > 0 ? `· ${total} Quests` : ''}
+            Accept {total === 1 ? 'Quest' : 'Quests'}
           </button>
         </div>
       </div>

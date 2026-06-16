@@ -54,7 +54,10 @@ function Game() {
   )
 
   const sideDone = sideQuests.filter((q) => q.status === 'completed').length
-  const mainActive = mainQuests.filter((q) => q.status !== 'completed').length
+  // Today's main quests (active + completed) vs. those inscribed for next cycle.
+  const mainToday = mainQuests.filter((q) => q.status !== 'drafted')
+  const mainDrafted = mainQuests.filter((q) => q.status === 'drafted')
+  const mainActive = mainQuests.filter((q) => q.status === 'active').length
 
   function toggle(id: string) {
     const q = state.quests.find((x) => x.id === id)
@@ -116,14 +119,42 @@ function Game() {
                   Inscribe one below — The System assigns it next cycle.
                 </div>
               ) : (
-                mainQuests.map((q) => (
-                  <QuestCard
-                    key={q.id}
-                    quest={q}
-                    onToggle={toggle}
-                    onDelete={(id) => dispatch({ type: 'DELETE', id })}
-                  />
-                ))
+                <>
+                  {mainToday.length > 0 ? (
+                    mainToday.map((q) => (
+                      <QuestCard
+                        key={q.id}
+                        quest={q}
+                        onToggle={toggle}
+                        onDelete={(id) => dispatch({ type: 'DELETE', id })}
+                      />
+                    ))
+                  ) : (
+                    <div className="empty">
+                      Nothing active this cycle.
+                      <br />
+                      {mainDrafted.length === 1
+                        ? 'Your inscribed quest arrives next cycle.'
+                        : 'Your inscribed quests arrive next cycle.'}
+                    </div>
+                  )}
+
+                  {mainDrafted.length > 0 && (
+                    <>
+                      <div className="col-divider">
+                        <span>INSCRIBED · ASSIGNED NEXT CYCLE</span>
+                      </div>
+                      {mainDrafted.map((q) => (
+                        <QuestCard
+                          key={q.id}
+                          quest={q}
+                          onToggle={toggle}
+                          onDelete={(id) => dispatch({ type: 'DELETE', id })}
+                        />
+                      ))}
+                    </>
+                  )}
+                </>
               )}
             </div>
             <AddMainQuest

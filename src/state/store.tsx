@@ -10,7 +10,7 @@ import type { CategoryId, ExpValue } from '../data/categories'
 import { daysBetween, toISODate } from '../lib/date'
 import { generateSideQuests, makeId } from '../lib/quests'
 import { buildRecap } from '../lib/recap'
-import { applyDecay, boostValue, emptyValues } from '../lib/stats'
+import { applyDrift, boostValue, emptyValues } from '../lib/stats'
 import { clearState, loadState, saveState } from '../lib/storage'
 import type { Quest, WandererState } from '../lib/types'
 
@@ -125,7 +125,7 @@ function reducer(state: FullState, action: Action): FullState {
       let values = state.values
       if (state.lastVisitDate) {
         const gap = daysBetween(state.lastVisitDate, currentDate)
-        values = applyDecay(values, gap)
+        values = applyDrift(values, gap)
       }
       // Replace side quests with today's communal set; keep all main quests.
       const mainQuests = state.quests.filter((q) => q.kind === 'main')
