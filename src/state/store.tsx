@@ -148,8 +148,12 @@ function reducer(state: FullState, action: Action): FullState {
       if (state.lastVisitDate) {
         values = applyNeglectDecay(values, lastActive, state.lastVisitDate, currentDate)
       }
-      // Replace side quests with today's communal set; keep all main quests.
-      const mainQuests = state.quests.filter((q) => q.kind === 'main')
+      // Replace side quests with today's communal set. Keep active + inscribed
+      // main quests; clear out the ones finished in the cycle that just ended
+      // (their EXP is already banked and they are counted in the recap above).
+      const mainQuests = state.quests.filter(
+        (q) => q.kind === 'main' && !(rolledToNewDay && q.status === 'completed'),
+      )
       const sideQuests =
         state.sideQuestsDate === currentDate
           ? state.quests.filter((q) => q.kind === 'side')
