@@ -2,21 +2,22 @@
 
 A whimsical, wellness-centered to-do app reimagined as a quest terminal. Earthlings
 are **Wanderers** who receive quests from **The System** (EarthOnline). Subtle sci-fi /
-celestial / retro-cyber feel — pixel art only, no emojis.
+celestial / retro-cyber feel with cute pixel art. 
 
 ## Concept
 
 - **Side quests** — issued every cycle (day) by The System, *the same for all Wanderers*,
   drawn from a curated pool of quick, low-pressure, wellness-and-whimsy prompts. Each day's
-  set covers at least 3 of the 5 categories.
+  set covers at least 3 of the 5 categories. 
 - **Main quests** — your own to-dos. You *inscribe* them; The System *officially assigns*
   them the next cycle via an animated assignment ceremony.
 - **5 categories** — Growth, Body, Bond, Sanctuary, Wonder. Each carries a 0–10 fulfillment
-  value; their average is your **Happiness Index**.
+  value; their average is your **Happiness Index**. These 5 categories are designed to help
+  raise the quality of your life.
 - **EXP & levels** — every quest grants 20/40/60 EXP; completing quests raises both your
   level and the relevant category value (which gently decays when neglected).
-- **Pip** — a fallen star and your assistant. Pip's mood tracks the Happiness Index and
-  appears in the daily assignment ceremony.
+- **Pip** — a fallen star and your assistant. Pip's mood changes with the Happiness Index 
+  and appears in the daily assignment ceremony.
 
 ## Architecture
 
