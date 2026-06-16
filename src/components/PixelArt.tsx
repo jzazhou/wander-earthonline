@@ -60,13 +60,13 @@ const ICONS: Record<CategoryId, string[]> = {
     '...#...',
   ],
   body: [
-    '...###.',
-    '..##...',
-    '.##....',
-    '.#####.',
-    '...##..',
-    '..##...',
-    '.##....',
+    '.......',
+    '##...##',
+    '##...##',
+    '#######',
+    '##...##',
+    '##...##',
+    '.......',
   ],
   bond: [
     '.##.##.',
@@ -106,7 +106,7 @@ export function CategoryIcon({
   unit?: number
   color: string
 }) {
-  return <PixelGrid rows={ICONS[id]} unit={unit} color={color} />
+  return <PixelGrid className="picon" rows={ICONS[id]} unit={unit} color={color} />
 }
 
 // ── Glyphs ──────────────────────────────────────────────────────
