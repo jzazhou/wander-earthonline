@@ -60,4 +60,6 @@ export interface WandererState {
   sideQuestsDate: string
   /** Recap of the previous cycle, awaiting the daybreak report. Null when none pending. */
   pendingRecap: DailyRecap | null
+  /** Set once at registration so a new Wanderer sees their first quest assignment. */
+  pendingFirstAssignment: boolean
 }

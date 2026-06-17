@@ -88,6 +88,7 @@ export function DaybreakModal({
   mood,
   sideQuests,
   assignments,
+  firstTime = false,
   onComplete,
 }: {
   recap: DailyRecap | null
@@ -95,6 +96,8 @@ export function DaybreakModal({
   mood: PipMood
   sideQuests: Quest[]
   assignments: Quest[]
+  /** True the very first time a new Wanderer receives quests, post-onboarding. */
+  firstTime?: boolean
   onComplete: () => void
 }) {
   const [phase, setPhase] = useState<'report' | 'assign'>(recap ? 'report' : 'assign')
@@ -162,12 +165,15 @@ export function DaybreakModal({
             <Pip mood="radiant" unit={6} />
           </div>
         </div>
-        <h2 className="modal__title">A new cycle dawns, Wanderer.</h2>
+        <h2 className="modal__title">
+          {firstTime ? `Your first quests await, ${name}.` : 'A new cycle dawns, Wanderer.'}
+        </h2>
         <p className="modal__lead">
-          The System issues your quests for this cycle.
-          {assignments.length > 0
-            ? ' The quests you inscribed are now made official, alongside today’s shared side quests.'
-            : ' Today’s side quests are shared by every Wanderer across EarthOnline.'}
+          {firstTime
+            ? 'The System has prepared your opening set. Today’s side quests are shared by every Wanderer across EarthOnline.'
+            : assignments.length > 0
+              ? 'The System issues your quests for this cycle. The quests you inscribed are now made official, alongside today’s shared side quests.'
+              : 'The System issues your quests for this cycle. Today’s side quests are shared by every Wanderer across EarthOnline.'}
         </p>
         <div className="assign-list">
           {assignments.map((q, i) => (

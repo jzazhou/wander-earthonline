@@ -189,13 +189,16 @@ function Game() {
         </footer>
       </div>
 
-      {(state.pendingRecap !== null || pendingAssignment.length > 0) && (
+      {(state.pendingRecap !== null ||
+        pendingAssignment.length > 0 ||
+        state.pendingFirstAssignment) && (
         <DaybreakModal
           recap={state.pendingRecap}
           name={state.name}
           mood={pipMood(happinessIndex(state.values))}
           sideQuests={sideQuests.filter((q) => q.status === 'active')}
           assignments={pendingAssignment}
+          firstTime={state.pendingFirstAssignment && state.pendingRecap === null}
           onComplete={() => {
             if (pendingAssignment.length > 0) {
               dispatch({ type: 'ASSIGN_PENDING', ids: pendingAssignment.map((q) => q.id) })

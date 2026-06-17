@@ -51,6 +51,7 @@ function freshState(): FullState {
     lastVisitDate: '',
     sideQuestsDate: '',
     pendingRecap: null,
+    pendingFirstAssignment: false,
     dayOffset: 0,
   }
 }
@@ -58,7 +59,13 @@ function freshState(): FullState {
 function reducer(state: FullState, action: Action): FullState {
   switch (action.type) {
     case 'INIT':
-      return { ...state, initialized: true, name: action.name.trim() || 'Wanderer' }
+      return {
+        ...state,
+        initialized: true,
+        name: action.name.trim() || 'Wanderer',
+        // Greet the new Wanderer with their first quest assignment.
+        pendingFirstAssignment: true,
+      }
 
     case 'ADD_MAIN': {
       const currentDate = currentISO(state)
@@ -170,7 +177,7 @@ function reducer(state: FullState, action: Action): FullState {
     }
 
     case 'DISMISS_RECAP':
-      return { ...state, pendingRecap: null }
+      return { ...state, pendingRecap: null, pendingFirstAssignment: false }
 
     case 'ADVANCE_DAY':
       return { ...state, dayOffset: state.dayOffset + 1 }
