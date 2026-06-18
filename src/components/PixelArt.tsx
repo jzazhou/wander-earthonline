@@ -140,19 +140,34 @@ const HOURGLASS = [
   '.###.',
   '#####',
 ]
+const BOOK = [
+  '#.#####',
+  '#.#...#',
+  '#.#...#',
+  '#.#...#',
+  '#.#...#',
+  '#.#...#',
+  '#.#####',
+]
+
+const GLYPHS = {
+  check: CHECK,
+  plus: PLUS,
+  cross: CROSS,
+  hourglass: HOURGLASS,
+  book: BOOK,
+} as const
 
 export function Glyph({
   kind,
   unit = 3,
   color = 'currentColor',
 }: {
-  kind: 'check' | 'plus' | 'cross' | 'hourglass'
+  kind: keyof typeof GLYPHS
   unit?: number
   color?: string
 }) {
-  const rows =
-    kind === 'check' ? CHECK : kind === 'plus' ? PLUS : kind === 'hourglass' ? HOURGLASS : CROSS
-  return <PixelGrid rows={rows} unit={unit} color={color} />
+  return <PixelGrid rows={GLYPHS[kind]} unit={unit} color={color} />
 }
 
 // ── Pip, the fallen star ────────────────────────────────────────

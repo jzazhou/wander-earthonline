@@ -30,6 +30,14 @@ export interface Quest {
 export type CategoryValues = Record<CategoryId, number>
 export type CategoryDates = Record<CategoryId, string>
 
+/** A free-form entry in the Wanderer's Quest Book. */
+export interface JournalEntry {
+  id: string
+  /** Full ISO timestamp of when it was written. */
+  createdAt: string
+  text: string
+}
+
 /** Summary of the cycle that just ended, shown in the daybreak report. */
 export interface DailyRecap {
   /** ISO date (YYYY-MM-DD) of the day being summarized. */
@@ -62,4 +70,6 @@ export interface WandererState {
   pendingRecap: DailyRecap | null
   /** Set once at registration so a new Wanderer sees their first quest assignment. */
   pendingFirstAssignment: boolean
+  /** The Wanderer's Quest Book entries, newest first. */
+  journal: JournalEntry[]
 }

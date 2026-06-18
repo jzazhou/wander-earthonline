@@ -4,6 +4,7 @@ import { Hud, Band } from './components/Dashboard'
 import QuestCard from './components/QuestCard'
 import AddMainQuest from './components/AddMainQuest'
 import { Onboarding, DaybreakModal } from './components/Modals'
+import QuestBook from './components/QuestBook'
 import { Pip } from './components/PixelArt'
 import { StoreProvider, useStore } from './state/store'
 import { happinessIndex, levelFromExp, pipMood } from './lib/stats'
@@ -18,6 +19,7 @@ function sortQuests(quests: Quest[]): Quest[] {
 function Game() {
   const { state, currentDate, dispatch } = useStore()
   const [levelUp, setLevelUp] = useState<number | null>(null)
+  const [bookOpen, setBookOpen] = useState(false)
   const prevLevel = useRef(levelFromExp(state.totalExp).level)
 
   // Detect a level-up to fire the celebratory toast.
@@ -78,7 +80,12 @@ function Game() {
     <>
       <Starfield />
       <div className="app">
-        <Hud name={state.name} totalExp={state.totalExp} currentDate={currentDate} />
+        <Hud
+          name={state.name}
+          totalExp={state.totalExp}
+          currentDate={currentDate}
+          onOpenBook={() => setBookOpen(true)}
+        />
         <Band values={state.values} />
 
         <section className="board">
@@ -205,6 +212,15 @@ function Game() {
             }
             dispatch({ type: 'DISMISS_RECAP' })
           }}
+        />
+      )}
+
+      {bookOpen && (
+        <QuestBook
+          entries={state.journal}
+          onAdd={(text) => dispatch({ type: 'ADD_JOURNAL', text })}
+          onDelete={(id) => dispatch({ type: 'DELETE_JOURNAL', id })}
+          onClose={() => setBookOpen(false)}
         />
       )}
 

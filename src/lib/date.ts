@@ -21,3 +21,13 @@ export function daysBetween(aISO: string, bISO: string): number {
 export function cycleLabel(isoDate: string): string {
   return 'CYCLE ' + isoDate.replace(/-/g, '.')
 }
+
+/** Quest Book stamp, e.g. "2026.06.18 · 14:32" (optionally with seconds). */
+export function formatStamp(d: Date, withSeconds = false): string {
+  const date = toISODate(d).replace(/-/g, '.')
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  if (!withSeconds) return `${date} · ${hh}:${mm}`
+  const ss = String(d.getSeconds()).padStart(2, '0')
+  return `${date} · ${hh}:${mm}:${ss}`
+}

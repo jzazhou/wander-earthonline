@@ -8,17 +8,19 @@ import {
   VALUE_MAX,
 } from '../lib/stats'
 import type { CategoryValues } from '../lib/types'
-import { CategoryIcon, Pip } from './PixelArt'
+import { CategoryIcon, Glyph, Pip } from './PixelArt'
 
 // ── Header / system HUD ─────────────────────────────────────────
 export function Hud({
   name,
   totalExp,
   currentDate,
+  onOpenBook,
 }: {
   name: string
   totalExp: number
   currentDate: string
+  onOpenBook: () => void
 }) {
   const lvl = levelFromExp(totalExp)
   return (
@@ -35,6 +37,10 @@ export function Hud({
       </div>
 
       <div className="hud__meta">
+        <button className="bookbtn" onClick={onOpenBook} aria-label="Open Quest Book" title="Quest Book">
+          <Glyph kind="book" unit={3} color="var(--gold)" />
+          <span>QUEST BOOK</span>
+        </button>
         <div className="panel levelchip">
           <div>
             <div className="levelchip__lv">LEVEL</div>

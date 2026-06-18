@@ -35,6 +35,8 @@ type Action =
   | { type: 'UNCOMPLETE'; id: string }
   | { type: 'DELETE'; id: string }
   | { type: 'ASSIGN_PENDING'; ids: string[] }
+  | { type: 'ADD_JOURNAL'; text: string }
+  | { type: 'DELETE_JOURNAL'; id: string }
   | { type: 'PROCESS_DAY'; currentDate: string }
   | { type: 'DISMISS_RECAP' }
   | { type: 'ADVANCE_DAY' }
@@ -52,6 +54,7 @@ function freshState(): FullState {
     sideQuestsDate: '',
     pendingRecap: null,
     pendingFirstAssignment: false,
+    journal: [],
     dayOffset: 0,
   }
 }
@@ -129,6 +132,16 @@ function reducer(state: FullState, action: Action): FullState {
         ),
       }
     }
+
+    case 'ADD_JOURNAL': {
+      const text = action.text.trim()
+      if (!text) return state
+      const entry = { id: makeId(), createdAt: new Date().toISOString(), text }
+      return { ...state, journal: [entry, ...state.journal] }
+    }
+
+    case 'DELETE_JOURNAL':
+      return { ...state, journal: state.journal.filter((e) => e.id !== action.id) }
 
     case 'PROCESS_DAY': {
       const { currentDate } = action
