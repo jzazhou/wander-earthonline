@@ -1041,13 +1041,134 @@ textarea.field { resize: vertical; min-height: 38px; }
   letter-spacing: 0.04em;
 }
 
-.qbook__entries {
+.qbook__body {
   display: flex;
   flex-direction: column;
   gap: 12px;
   overflow-y: auto;
   padding-right: 4px;
   margin-right: -4px;
+}
+.qbook__head-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.qbook__toggle {
+  display: flex;
+  border: 1px solid var(--line);
+}
+.qbook__tab {
+  background: transparent;
+  border: none;
+  color: var(--ink-faint);
+  font-family: var(--pixel);
+  font-size: 7.5px;
+  letter-spacing: 0.1em;
+  padding: 9px 11px;
+  transition: background 0.14s, color 0.14s;
+}
+.qbook__tab--on {
+  background: rgba(110, 240, 224, 0.14);
+  color: var(--system);
+}
+.qbook__more {
+  text-align: center;
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  letter-spacing: 0.03em;
+  padding: 8px 6px 2px;
+}
+
+/* Calendar */
+.qcal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.qcal__month {
+  font-family: var(--pixel);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+.qcal__nav {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  font-family: var(--pixel);
+  font-size: 9px;
+  padding: 6px 12px;
+  transition: color 0.14s, border-color 0.14s;
+}
+.qcal__nav:hover { color: var(--system); border-color: var(--system-deep); }
+.qcal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.qcal__dow {
+  text-align: center;
+  font-family: var(--pixel);
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  padding-bottom: 4px;
+}
+.qcal__cell {
+  position: relative;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  font-family: var(--mono);
+  font-size: 12px;
+  transition: background 0.14s, color 0.14s, box-shadow 0.14s;
+}
+.qcal__cell--empty {
+  background: transparent;
+  border-color: transparent;
+}
+.qcal__cell--has {
+  color: var(--ink);
+  cursor: pointer;
+}
+.qcal__cell:not(.qcal__cell--empty):hover {
+  background: rgba(110, 240, 224, 0.08);
+  color: #fff;
+}
+.qcal__cell--today {
+  border-color: var(--line-strong);
+}
+.qcal__cell--sel {
+  background: rgba(110, 240, 224, 0.16);
+  color: #fff;
+  box-shadow: 0 0 0 1px var(--system-deep);
+}
+.qcal__dot {
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold);
+}
+.qcal__day {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.qcal__day-stamp {
+  font-family: var(--pixel);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: var(--system);
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
 }
 .qbook__entry {
   animation: cardIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
