@@ -183,28 +183,30 @@ export default function QuestBook({
 
         {/* Body */}
         <div className="qbook__body">
-          {entries.length === 0 ? (
-            <div className="qbook__empty">
-              The book is blank for now.
-              <br />
-              Every page you write is kept here, stamped with its moment.
-            </div>
-          ) : view === 'list' ? (
-            <>
-              {recent.map((e) => (
-                <EntryPage
-                  key={e.id}
-                  entry={e}
-                  stamp={formatStamp(new Date(e.createdAt))}
-                  onDelete={onDelete}
-                />
-              ))}
-              {entries.length > recent.length && (
-                <div className="qbook__more">
-                  Showing your {recent.length} most recent pages — switch to CALENDAR to browse the rest.
-                </div>
-              )}
-            </>
+          {view === 'list' ? (
+            entries.length === 0 ? (
+              <div className="qbook__empty">
+                The book is blank for now.
+                <br />
+                Every page you write is kept here, stamped with its moment.
+              </div>
+            ) : (
+              <>
+                {recent.map((e) => (
+                  <EntryPage
+                    key={e.id}
+                    entry={e}
+                    stamp={formatStamp(new Date(e.createdAt))}
+                    onDelete={onDelete}
+                  />
+                ))}
+                {entries.length > recent.length && (
+                  <div className="qbook__more">
+                    Showing your {recent.length} most recent pages — switch to CALENDAR to browse the rest.
+                  </div>
+                )}
+              </>
+            )
           ) : (
             <div className="qcal">
               <div className="qcal__head">

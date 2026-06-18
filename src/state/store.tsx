@@ -226,10 +226,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const currentDate = currentISO(state)
 
-  // Roll the day forward (decay + fresh side quests) whenever the date changes.
+  // Roll the day forward (decay + fresh side quests) whenever the date changes
+  // OR the stored cycle falls out of sync with it — e.g. right after a reset,
+  // where currentDate is unchanged but sideQuestsDate has gone blank. The
+  // action itself is idempotent, so re-running it when already current is a
+  // no-op (and won't loop).
   useEffect(() => {
     dispatch({ type: 'PROCESS_DAY', currentDate })
-  }, [currentDate])
+  }, [currentDate, state.sideQuestsDate, state.lastVisitDate])
 
   // Persist everything except the volatile dayOffset-derived view.
   useEffect(() => {
