@@ -1205,3 +1205,28 @@ textarea.field { resize: vertical; min-height: 38px; }
   line-height: 1.7;
   border: 1px dashed var(--line);
 }
+
+/* ── Pixel cursors ────────────────────────────────────────── */
+/* White pixel arrow by default; gold arrow over anything clickable.
+   Hotspot (1,1) sits on the arrow tip. Falls back to system cursors
+   if the SVGs fail to load. Text fields keep the native caret. */
+html {
+  cursor: url('/cursor.svg') 1 1, auto;
+}
+a,
+button,
+[role='button'],
+select,
+summary {
+  cursor: url('/cursor-gold.svg') 1 1, pointer;
+}
+input,
+textarea,
+.field,
+.qbook__field,
+[contenteditable='true'] {
+  cursor: text;
+}
+button:disabled {
+  cursor: url('/cursor.svg') 1 1, not-allowed;
+}
