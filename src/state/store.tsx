@@ -89,6 +89,15 @@ function reducer(state: FullState, action: Action): FullState {
     case 'COMPLETE': {
       const q = state.quests.find((x) => x.id === action.id)
       if (!q || q.status === 'completed') return state
+      if (typeof pendo !== 'undefined') {
+        pendo.track("quest_completed", {
+          quest_kind: q.kind,
+          category: q.category,
+          exp_gained: q.exp,
+          quest_id: q.id,
+          quest_title: q.title
+        })
+      }
       const currentDate = currentISO(state)
       return {
         ...state,
@@ -107,6 +116,14 @@ function reducer(state: FullState, action: Action): FullState {
     case 'UNCOMPLETE': {
       const q = state.quests.find((x) => x.id === action.id)
       if (!q || q.status !== 'completed') return state
+      if (typeof pendo !== 'undefined') {
+        pendo.track("quest_uncompleted", {
+          quest_kind: q.kind,
+          category: q.category,
+          exp_refunded: q.exp,
+          quest_id: q.id
+        })
+      }
       // Refund EXP; leave category value (decay model is one-directional & gentle).
       return {
         ...state,

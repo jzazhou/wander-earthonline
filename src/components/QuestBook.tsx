@@ -91,6 +91,13 @@ export default function QuestBook({
   function record() {
     const t = draft.trim()
     if (!t) return
+    if (typeof pendo !== 'undefined') {
+      pendo.track("journal_entry_recorded", {
+        entry_length: t.length,
+        word_count: t.split(/\s+/).filter(Boolean).length,
+        total_journal_entries: entries.length + 1
+      })
+    }
     onAdd(t)
     setDraft('')
     setPrompt(randomPrompt())
@@ -99,6 +106,16 @@ export default function QuestBook({
     setMonth({ y: today.getFullYear(), m: today.getMonth() })
     setSelected(toISODate(today))
     taRef.current?.focus()
+  }
+
+  function handleEntryDelete(id: string) {
+    if (typeof pendo !== 'undefined') {
+      pendo.track("journal_entry_deleted", {
+        entry_id: id,
+        remaining_entries_count: entries.length - 1
+      })
+    }
+    onDelete(id)
   }
 
   // Build the month grid cells (leading blanks + day numbers).
@@ -202,7 +219,7 @@ export default function QuestBook({
                     key={e.id}
                     entry={e}
                     stamp={formatStamp(new Date(e.createdAt))}
-                    onDelete={onDelete}
+                    onDelete={handleEntryDelete}
                   />
                 ))}
                 {entries.length > recent.length && (
@@ -258,7 +275,7 @@ export default function QuestBook({
                   <div className="qbook__empty">No pages written on this day.</div>
                 ) : (
                   selectedEntries.map((e) => (
-                    <EntryPage key={e.id} entry={e} stamp={hhmm(e.createdAt)} onDelete={onDelete} />
+                    <EntryPage key={e.id} entry={e} stamp={hhmm(e.createdAt)} onDelete={handleEntryDelete} />
                   ))
                 )}
               </div>

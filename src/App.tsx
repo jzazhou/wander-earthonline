@@ -25,7 +25,17 @@ function Game() {
   // Detect a level-up to fire the celebratory toast.
   useEffect(() => {
     const lvl = levelFromExp(state.totalExp).level
-    if (lvl > prevLevel.current) setLevelUp(lvl)
+    if (lvl > prevLevel.current) {
+      if (typeof pendo !== 'undefined') {
+        pendo.track("level_up_achieved", {
+          new_level: lvl,
+          total_exp: state.totalExp,
+          happiness_index: Number(happinessIndex(state.values).toFixed(2)),
+          pip_mood: pipMood(happinessIndex(state.values))
+        })
+      }
+      setLevelUp(lvl)
+    }
     prevLevel.current = lvl
   }, [state.totalExp])
 
@@ -65,6 +75,20 @@ function Game() {
     const q = state.quests.find((x) => x.id === id)
     if (!q) return
     dispatch({ type: q.status === 'completed' ? 'UNCOMPLETE' : 'COMPLETE', id })
+  }
+
+  function handleDelete(id: string) {
+    const q = state.quests.find((x) => x.id === id)
+    if (q && typeof pendo !== 'undefined') {
+      pendo.track("main_quest_deleted", {
+        category: q.category,
+        exp: q.exp,
+        quest_status: q.status,
+        quest_kind: q.kind,
+        quest_id: q.id
+      })
+    }
+    dispatch({ type: 'DELETE', id })
   }
 
   if (!state.initialized) {
@@ -133,7 +157,7 @@ function Game() {
                         key={q.id}
                         quest={q}
                         onToggle={toggle}
-                        onDelete={(id) => dispatch({ type: 'DELETE', id })}
+                        onDelete={handleDelete}
                       />
                     ))
                   ) : (
@@ -156,7 +180,7 @@ function Game() {
                           key={q.id}
                           quest={q}
                           onToggle={toggle}
-                          onDelete={(id) => dispatch({ type: 'DELETE', id })}
+                          onDelete={handleDelete}
                         />
                       ))}
                     </>
@@ -186,6 +210,15 @@ function Game() {
             <button
               onClick={() => {
                 if (confirm('Reset EarthOnline? All progress on this device is erased.')) {
+                  if (typeof pendo !== 'undefined') {
+                    pendo.track("terminal_reset", {
+                      total_exp_at_reset: state.totalExp,
+                      level_at_reset: levelFromExp(state.totalExp).level,
+                      quest_count: state.quests.length,
+                      journal_entry_count: state.journal.length,
+                      happiness_index_at_reset: Number(happinessIndex(state.values).toFixed(2))
+                    })
+                  }
                   dispatch({ type: 'RESET' })
                 }
               }}
@@ -205,6 +238,17 @@ function Game() {
           assignments={pendingAssignment}
           firstTime={state.pendingFirstAssignment && state.pendingRecap === null}
           onComplete={() => {
+            if (typeof pendo !== 'undefined') {
+              pendo.track("daybreak_ceremony_completed", {
+                recap_quests_completed: state.pendingRecap?.questsCompleted ?? 0,
+                recap_exp_gained: state.pendingRecap?.expGained ?? 0,
+                recap_categories_count: state.pendingRecap?.categories.length ?? 0,
+                assignments_count: pendingAssignment.length,
+                side_quests_count: sideQuests.filter((q) => q.status === 'active').length,
+                is_first_time: state.pendingFirstAssignment && state.pendingRecap === null,
+                pip_mood: pipMood(happinessIndex(state.values))
+              })
+            }
             if (pendingAssignment.length > 0) {
               dispatch({ type: 'ASSIGN_PENDING', ids: pendingAssignment.map((q) => q.id) })
             }

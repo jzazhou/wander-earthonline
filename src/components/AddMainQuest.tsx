@@ -30,6 +30,15 @@ export default function AddMainQuest({
     e.preventDefault()
     const t = title.trim()
     if (!t) return
+    if (typeof pendo !== 'undefined') {
+      pendo.track("main_quest_created", {
+        category,
+        exp,
+        start_now: startNow,
+        has_detail: !!detail.trim(),
+        title_length: t.length
+      })
+    }
     onAdd({ title: t, detail: detail.trim() || undefined, category, exp, startNow })
     setTitle('')
     setDetail('')

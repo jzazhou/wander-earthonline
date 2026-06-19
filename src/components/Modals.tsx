@@ -8,6 +8,18 @@ import { CategoryIcon, Pip } from './PixelArt'
 // ── First-run onboarding: EarthOnline registers a new Wanderer ───
 export function Onboarding({ onConfirm }: { onConfirm: (name: string) => void }) {
   const [name, setName] = useState('')
+
+  function handleConfirm() {
+    const callsign = name.trim() || 'Wanderer'
+    if (typeof pendo !== 'undefined') {
+      pendo.track("wanderer_registered", {
+        callsign,
+        used_default_name: !name.trim()
+      })
+    }
+    onConfirm(callsign)
+  }
+
   return (
     <div className="scrim">
       <div className="panel modal">
@@ -35,11 +47,11 @@ export function Onboarding({ onConfirm }: { onConfirm: (name: string) => void })
           maxLength={24}
           autoFocus
           onKeyDown={(e) => {
-            if (e.key === 'Enter') onConfirm(name.trim() || 'Wanderer')
+            if (e.key === 'Enter') handleConfirm()
           }}
         />
         <div className="modal__actions">
-          <button className="pixel-btn pixel-btn--primary" onClick={() => onConfirm(name.trim() || 'Wanderer')}>
+          <button className="pixel-btn pixel-btn--primary" onClick={handleConfirm}>
             Begin Wandering
           </button>
         </div>
