@@ -100,10 +100,13 @@ export function DaybreakModal({
   firstTime?: boolean
   onComplete: () => void
 }) {
-  const [phase, setPhase] = useState<'report' | 'assign'>(recap ? 'report' : 'assign')
+  // Derive the phase from the recap so it can't lock to the wrong value if the
+  // modal mounts before the recap arrives (e.g. with a quest queued for the
+  // next cycle). Show the report until the Wanderer moves past it.
+  const [reportSeen, setReportSeen] = useState(false)
 
   // ── Phase 1: cycle report ──
-  if (phase === 'report' && recap) {
+  if (recap && !reportSeen) {
     const date = recap.date.replace(/-/g, '.')
     return (
       <div className="scrim">
@@ -145,7 +148,7 @@ export function DaybreakModal({
           <p className="recap-encourage">{encouragement(recap)}</p>
 
           <div className="modal__actions">
-            <button className="pixel-btn pixel-btn--primary" onClick={() => setPhase('assign')}>
+            <button className="pixel-btn pixel-btn--primary" onClick={() => setReportSeen(true)}>
               Receive Today's Quests
             </button>
           </div>

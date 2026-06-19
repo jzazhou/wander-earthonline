@@ -196,9 +196,7 @@ function Game() {
         </footer>
       </div>
 
-      {(state.pendingRecap !== null ||
-        pendingAssignment.length > 0 ||
-        state.pendingFirstAssignment) && (
+      {(state.pendingRecap !== null || state.pendingFirstAssignment) && (
         <DaybreakModal
           recap={state.pendingRecap}
           name={state.name}
