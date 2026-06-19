@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { JOURNAL_PROMPTS } from '../data/journalPrompts'
 import { formatStamp, toISODate } from '../lib/date'
 import type { JournalEntry } from '../lib/types'
 import { Glyph } from './PixelArt'
+
+const randomPrompt = () => JOURNAL_PROMPTS[Math.floor(Math.random() * JOURNAL_PROMPTS.length)]
 
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 const MONTHS = [
@@ -56,6 +59,7 @@ export default function QuestBook({
   const [view, setView] = useState<'list' | 'calendar'>('list')
   const [month, setMonth] = useState(() => ({ y: now.getFullYear(), m: now.getMonth() }))
   const [selected, setSelected] = useState<string>(() => toISODate(new Date()))
+  const [prompt, setPrompt] = useState(randomPrompt)
   const taRef = useRef<HTMLTextAreaElement>(null)
 
   // A softly ticking clock so the "now" stamp feels alive while you write.
@@ -89,6 +93,7 @@ export default function QuestBook({
     if (!t) return
     onAdd(t)
     setDraft('')
+    setPrompt(randomPrompt())
     // Surface the new page: jump to today in the calendar.
     const today = new Date()
     setMonth({ y: today.getFullYear(), m: today.getMonth() })
@@ -161,7 +166,7 @@ export default function QuestBook({
           <textarea
             ref={taRef}
             className="qbook__field"
-            placeholder="Write anything, Wanderer. The page is yours."
+            placeholder={prompt}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
