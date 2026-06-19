@@ -22,6 +22,21 @@ function Game() {
   const [bookOpen, setBookOpen] = useState(false)
   const prevLevel = useRef(levelFromExp(state.totalExp).level)
 
+  // Identify the visitor with Pendo whenever metadata changes.
+  useEffect(() => {
+    if (state.initialized) {
+      pendo.identify({
+        visitor: {
+          id: state.name,
+          full_name: state.name,
+          initialized: state.initialized,
+          totalExp: state.totalExp,
+          lastVisitDate: state.lastVisitDate,
+        }
+      });
+    }
+  }, [state.initialized, state.name, state.totalExp, state.lastVisitDate]);
+
   // Detect a level-up to fire the celebratory toast.
   useEffect(() => {
     const lvl = levelFromExp(state.totalExp).level
@@ -186,6 +201,7 @@ function Game() {
             <button
               onClick={() => {
                 if (confirm('Reset EarthOnline? All progress on this device is erased.')) {
+                  pendo.clearSession()
                   dispatch({ type: 'RESET' })
                 }
               }}
